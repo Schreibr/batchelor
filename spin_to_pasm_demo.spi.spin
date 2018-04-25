@@ -168,9 +168,25 @@ entry                   mov     tmp1, par                       ' start of struc
         
 
 addvals                 add     tmp1, #4                        ' 4 for longs
-                        rdlong  v1, tmp1                      ' get 1st parameter from hub
+                        rdlong  m, tmp1                      ' get 1st parameter from hub
                         add     tmp1, #4
-                        rdlong  v2, tmp1
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
+                        add     tmp1, #4
+                        rdlong  k1, tmp1
                         add     tmp1, #4                        ' 4 for longs
 {                        rdlong  w1, tmp1       }               ' get 1st parameter from hub
                         add     tmp1, #4
@@ -214,6 +230,10 @@ done                    mov     cmd, #0                         ' clear cmd
                         
                         jmp     #entry                          ' wait for new cmd
 
+teilmult
+              mov        
+              
+
 ' -------------------------------------------------------------------------------------------------
 
 acc1    long 0
@@ -230,8 +250,17 @@ tmp2                    res     1
 cmd                     res     1
 v1                    res     1
 v2                    res     1
+m                       res     1
 w1                    res     1
 w2                    res     1
+k1      res   1
+k2      res   1
+k3      res   1
+k4      res   1
+k5      res   1
+k6      res   1
+k7      res   1
+k8      res   1
 
                         fit     492
 
