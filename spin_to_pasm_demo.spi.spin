@@ -167,30 +167,24 @@ entry                   mov     tmp1, par                       ' start of struc
                         jmp     #done                           ' invalid command
         
 
-addvals                 add     tmp1, #4                        ' 4 for longs
+addvals               { add     tmp1, #4                        ' 4 for longs
                         rdlong  m, tmp1                      ' get 1st parameter from hub
                         add     tmp1, #4
                         rdlong  k1, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k2, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k3, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k4, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k5, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k6, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
+                        rdlong  k7, tmp1
                         add     tmp1, #4
-                        rdlong  k1, tmp1
-                        add     tmp1, #4
-                        rdlong  k1, tmp1
-                        add     tmp1, #4                        ' 4 for longs
-{                        rdlong  w1, tmp1       }               ' get 1st parameter from hub
-                        add     tmp1, #4
- {                       rdlong  w2, tmp1     }
+                        rdlong  k8, tmp1   }
                         
                         jmp     #mult
 
@@ -223,7 +217,7 @@ mult
               mov       Time2, cnt 
               mov       DeltaTime, Time2
               sub       DeltaTime, Time1
-              jmp       #retn 
+           {   jmp       #retn    }
 
 done                    mov     cmd, #0                         ' clear cmd
                         wrlong  cmd, par
@@ -231,7 +225,24 @@ done                    mov     cmd, #0                         ' clear cmd
                         jmp     #entry                          ' wait for new cmd
 
 teilmult
-              mov        
+              add       tmp1, #4                       
+              rdlong    v1, tmp1
+              mov       j,#8 
+:loop         
+              add     tmp1, #4
+              rdlong  v2, tmp1
+              jmp       #mult
+              add       tmp1, #32
+              add       vRes, tRes1             wc
+        if_c  add       tmp2, #1  wc
+              add       vRes2, tmp wc
+              mov       tmp2, #0
+        if_c  mov       tmp2, #1                          
+              wrlong    vRes, tmp1
+              mov       tRes1, vRes2
+              sub       tmp1, #32
+              
+              djnz      j,#:loop             
               
 
 ' -------------------------------------------------------------------------------------------------
@@ -239,11 +250,13 @@ teilmult
 acc1    long 0
 acc2    long 0                                             
 vRes    long 0
-vRes2   long 0  
+vRes2   long 0
+tRes1   long 0  
 Time1   long 0
 Time2   long 0
 DeltaTime    res 1
-i    res 1  
+i    res 1
+j    res 1 
 tmp1                    res     1
 tmp2                    res     1
 
