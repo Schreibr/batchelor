@@ -45,12 +45,23 @@ var
 
   long  cog
   long  cogcmd
+  long  m1
   long  param1
   long  param2
   long  param3
   long  param4
+  long  param5
+  long  param6
+  long  param7
+  long  param8
   long  result1
-  long  result2 
+  long  result2
+  long  result3
+  long  result4
+  long  result5
+  long  result6
+  long  result7
+  long  result8 
   long  time
   long  timetest
   long  ratio
@@ -62,34 +73,83 @@ var
 pub main | val1, val2, wa1, wa2
 
   gui:=1
+ { repeat from 0 to 8     }
   start                                                         ' start math cog
 
   term.start(RX1, TX1, %0000, 115_200)
   waitcnt(cnt + (1 * clkfreq))          
   wa1:=0
   wa2:=0
+  param1:=34556
+  param2:=464637
+  param3:=45466
+  param4:=4147480000
+  param5:=4643
+  param6:=333446
+  param7:=5632
+  param8:=634
+
+  result8:=0
+  result7:=0
+  result6:=0
+  result5:=0
+  result4:=0
+  result3:=0
+  result2:=0
+  result1:=0
+                      
+
+
+  
   term.tx(CLS)
   term.str(string("Const Mult Test", CR, CR))
   if gui
-    repeat val1 from 1073741824 to 1073741825
-      repeat val2 from 32 to 32
-        term.dec(val1)
+        m1:=16  
+        term.dec(m1)
+        term.tx(CR)
+        term.bin(param8,32)
         term.tx(TAB)
-        term.dec(val2)
+        term.bin(param7,32)
         term.tx(TAB)
-        addem(val1, val2 , wa1, wa2)
-        term.bin(result2,32)
-        term.bin(result1,32)
+        term.bin(param6,32)
         term.tx(TAB)
+        term.bin(param5,32)
+        term.tx(TAB)
+        term.bin(param4,32)
+        term.tx(TAB)
+        term.bin(param3,32)
+        term.tx(TAB)
+        term.bin(param2,32)
+        term.tx(TAB)
+        term.bin(param1,32)
+        term.tx(TAB)
+        term.tx(CR)
+        addem(val1) 
+        term.bin(result8,32)
+        term.tx(TAB)
+        term.bin(result7,32)
+        term.tx(TAB)
+        term.bin(result6,32) 
+        term.tx(TAB)
+        term.bin(result5,32) 
+        term.tx(TAB)
+        term.bin(result4,32) 
+        term.tx(TAB)
+        term.bin(result3,32)
+        term.tx(TAB)
+        term.bin(result2,32) 
+        term.tx(TAB)
+        term.bin(result1,32)         
+        term.tx(CR)
         term.dec(time)
-        ratio:=time/timetest
+       { ratio:=time/timetest
         if timetest==1
             ratio:=1
             totratio:=1   
         timetest:=time            
         totratio:=totratio*ratio
         term.tx(TAB)
-        term.dec(totratio)
+        term.dec(totratio) }
         term.tx(CR)
   {else
     repeat val1 from 2147480000 to 2147483647
@@ -107,7 +167,7 @@ pub main | val1, val2, wa1, wa2
        val2:=0
        wa1:=0
        wa2:=0
-       term.dec(addem(val1, val2 , wa1, wa2)) 
+       term.dec(addem(val1)) 
 
   repeat
     waitcnt(0)
@@ -125,7 +185,6 @@ pub pause(ms) | t
 pub start
 
 '' Start math cog (PASM)
-
   stop
   cog := cognew(@entry, @cogcmd) + 1
   timetest := 1
@@ -140,11 +199,11 @@ pub stop
     cogstop(cog~ - 1)
 
 
-pub addem(value1, value2, wal1, wal2)
+pub addem(value1)
 
 '' returns value1 + value2
 
-  longmove(@param1, @value1, 4)                                 ' copy parameters
+{  longmove(@m1, @value1, 1)}                                 ' copy parameters
   cogcmd := 1                                                   ' alert cog
   repeat while cogcmd                                           ' wait for result
 
@@ -155,19 +214,21 @@ dat
 
                         org     0
 
+                        
 entry                   mov     tmp1, par                       ' start of structure
-                        rdlong  cmd, tmp1               wz      ' wait for cmd
+                        rdlong  cmd, tmp1               wz      ' wait for cmd 
         if_z            jmp     #entry
-
                         cmp     cmd, #1                 wz, wc  ' add?
-        if_e            jmp     #addvals
+        if_e            jmp     #teilmult
 
                         ' check other commands here
 
                         jmp     #done                           ' invalid command
         
 
-addvals               { add     tmp1, #4                        ' 4 for longs
+addvals
+               
+{ add     tmp1, #4                        ' 4 for longs
                         rdlong  m, tmp1                      ' get 1st parameter from hub
                         add     tmp1, #4
                         rdlong  k1, tmp1
@@ -185,25 +246,27 @@ addvals               { add     tmp1, #4                        ' 4 for longs
                         rdlong  k7, tmp1
                         add     tmp1, #4
                         rdlong  k8, tmp1   }
-                        
-                        jmp     #mult
+
 
                         
 retn
                        ' get 2nd parameter from hub                     ' add
-                        add     tmp1, #4                        ' point to result in hub
+                      {  add     tmp1, #4                        ' point to result in hub
                         wrlong  vRes, tmp1
                         add     tmp1, #4                        ' point to result in hub
-                        wrlong  vRes2, tmp1
-                        add     tmp1, #4                        ' point to result in hub
-                        wrlong  DeltaTime, tmp1
-                        jmp     #done                      ' write result to hub                   
+                        wrlong  vRes2, tmp1}
+              mov       Time2, cnt 
+              mov       DeltaTime, Time2
+              sub       DeltaTime, Time1                        
+              add     tmp1, #36                        ' point to result in hub
+              wrlong  DeltaTime, tmp1
+              jmp     #done                      ' write result to hub                   
 
 mult
+              mov       v1, input1
               mov       vRes, #0
               mov       vRes2, #0
               mov       w1, #0
-              mov       Time1, cnt 
               mov       i,#32
 :loop
               shr       v2, #1 wc
@@ -213,11 +276,8 @@ mult
               shl       w1, #1  
               shl       v1, #1  wc
         if_c  add       w1, #1     
-              djnz      i,#:loop       
-              mov       Time2, cnt 
-              mov       DeltaTime, Time2
-              sub       DeltaTime, Time1
-           {   jmp       #retn    }
+              djnz      i,#:loop
+mult_ret              ret
 
 done                    mov     cmd, #0                         ' clear cmd
                         wrlong  cmd, par
@@ -225,28 +285,32 @@ done                    mov     cmd, #0                         ' clear cmd
                         jmp     #entry                          ' wait for new cmd
 
 teilmult
+              mov       Time1, cnt   
               add       tmp1, #4                       
-              rdlong    v1, tmp1
+              rdlong    input1, tmp1        
               mov       j,#8 
-:loop         
-              add     tmp1, #4
-              rdlong  v2, tmp1
-              jmp       #mult
-              add       tmp1, #32
+:loop
+              add       tmp1, #4   
+              rdlong  v2, tmp1 
+              call      #mult  
+              add       tmp1, #32 
               add       vRes, tRes1             wc
         if_c  add       tmp2, #1  wc
-              add       vRes2, tmp wc
+              add       vRes2, tmp2 wc
               mov       tmp2, #0
         if_c  mov       tmp2, #1                          
               wrlong    vRes, tmp1
-              mov       tRes1, vRes2
-              sub       tmp1, #32
-              
-              djnz      j,#:loop             
-              
+              mov       tRes1, vRes2 
+              sub       tmp1, #32   
+              djnz      j,#:loop
+           {   add       tmp1, #32
+              wrlong    tRes1, tmp1} 
+              jmp       #retn
+         
 
 ' -------------------------------------------------------------------------------------------------
 
+input1  long 0 
 acc1    long 0
 acc2    long 0                                             
 vRes    long 0
@@ -254,6 +318,10 @@ vRes2   long 0
 tRes1   long 0  
 Time1   long 0
 Time2   long 0
+test1   long 1
+test2   long 45
+v1                    long     0
+v2                    long     0
 DeltaTime    res 1
 i    res 1
 j    res 1 
@@ -261,19 +329,9 @@ tmp1                    res     1
 tmp2                    res     1
 
 cmd                     res     1
-v1                    res     1
-v2                    res     1
 m                       res     1
 w1                    res     1
 w2                    res     1
-k1      res   1
-k2      res   1
-k3      res   1
-k4      res   1
-k5      res   1
-k6      res   1
-k7      res   1
-k8      res   1
 
                         fit     492
 
